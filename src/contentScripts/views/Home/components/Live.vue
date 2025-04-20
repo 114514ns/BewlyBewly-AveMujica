@@ -192,6 +192,7 @@ defineExpose({ initData })
         } : undefined"
         type="live"
         :show-watcher-later="false"
+        :show-preview="true"
         :horizontal="gridLayout !== 'adaptive'"
       />
     </div>

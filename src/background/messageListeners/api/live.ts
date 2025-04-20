@@ -16,6 +16,23 @@ const API_LIVE = {
     },
     afterHandle: AHS.J_D,
   },
+  getLivePreview: {
+    url: 'https://api.live.bilibili.com/xlive/web-room/v2/index/getRoomPlayInfo',
+    _fetch: {
+      method: 'get',
+    },
+    params: {
+      room_id: 0,
+      no_playurl: 0,
+      mask: 1,
+      qn: 0,
+      platform: 'web',
+      protocol: '0,1',
+      format: '0,1,2',
+      codec: '0,1',
+    },
+    afterHandle: AHS.J_D,
+  },
 
 } satisfies APIMAP
 

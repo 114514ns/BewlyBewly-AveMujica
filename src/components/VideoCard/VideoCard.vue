@@ -1,11 +1,13 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue'
+import flvjs from 'flv.js'
 import type { CSSProperties } from 'vue'
 import { useToast } from 'vue-toastification'
 
 import Button from '~/components/Button.vue'
 import { useBewlyApp } from '~/composables/useAppProvider'
 import { accessKey, settings } from '~/logic'
+import type { LivePreviewResult } from '~/models/live/livePreview'
 import type { VideoInfo } from '~/models/video/videoInfo'
 import type { VideoPreviewResult } from '~/models/video/videoPreview'
 import { useMainStore } from '~/stores/mainStore'
@@ -104,6 +106,21 @@ watch(() => isHover.value, async (newValue) => {
     }).then((res: VideoPreviewResult) => {
       if (res.code === 0)
         previewVideoUrl.value = res.data.durl[0].url
+    })
+  }
+  if (props.showPreview && settings.value.enableVideoPreview && props.video.liveStatus === 1) {
+    api.live.getLivePreview({
+      room_id: props.video.roomid,
+    }).then((res: LivePreviewResult) => {
+      const obj = res.data.playurl_info.playurl.stream[0].format[0].codec[0]
+      previewVideoUrl.value = obj.url_info[0].host + obj.base_url + obj.url_info[0].extra
+      const flvPlayer = flvjs.createPlayer({
+        type: 'flv',
+        url: previewVideoUrl.value,
+      })
+      flvPlayer.attachMediaElement(videoElement.value)
+      flvPlayer.load()
+      flvPlayer.play()
     })
   }
 })
@@ -301,7 +318,7 @@ provide('getVideoType', () => props.type!)
             <!-- Video preview -->
             <Transition v-if="!removed && showPreview && settings.enableVideoPreview" name="fade">
               <video
-                v-if="previewVideoUrl && isHover"
+                v-if="previewVideoUrl && isHover "
                 ref="videoElement"
                 autoplay muted
                 :controls="settings.enableVideoCtrlBarOnVideoCard"
